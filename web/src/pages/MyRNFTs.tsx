@@ -23,7 +23,7 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 
 interface RNFTData {
   tokenId: bigint;
-  orderId: bigint;
+  orderId: string; // bytes32 from contract
   merchant: string;
   customer: string;
   token: string;
@@ -163,8 +163,10 @@ const MyRNFTs = () => {
             origin: { y: 0.6 },
           });
 
-          // Refresh the page after a delay
-          setTimeout(() => window.location.reload(), 2000);
+          // Remove the refunded NFT from the list immediately
+          setRnfts((prevRnfts) =>
+            prevRnfts.filter((nft) => nft.tokenId !== tokenId)
+          );
         },
         onError: (error: any) => {
           setIsRefunding(false);

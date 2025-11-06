@@ -1,196 +1,205 @@
-import { useRef, useMemo, Suspense } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { MeshDistortMaterial, Sphere, OrbitControls, Stars } from '@react-three/drei';
-import * as THREE from 'three';
-
-// Particle system for floating dots around the orb
-function Particles() {
-  const particlesRef = useRef<THREE.Points>(null);
-  const particleCount = 1000;
-
-  const particles = useMemo(() => {
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount; i++) {
-      // Random positions in a sphere
-      const radius = 3 + Math.random() * 4;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(Math.random() * 2 - 1);
-
-      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = radius * Math.cos(phi);
-
-      // Gradient colors (cyan to purple)
-      const t = Math.random();
-      colors[i * 3] = t * 0.6 + 0.4; // R
-      colors[i * 3 + 1] = 0.8 - t * 0.3; // G
-      colors[i * 3 + 2] = 0.9 + t * 0.1; // B
-    }
-
-    return { positions, colors };
-  }, []);
-
-  useFrame(({ clock }) => {
-    if (particlesRef.current) {
-      particlesRef.current.rotation.y = clock.getElapsedTime() * 0.05;
-      particlesRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.1) * 0.1;
-    }
-  });
-
-  return (
-    <points ref={particlesRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particleCount}
-          array={particles.positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          count={particleCount}
-          array={particles.colors}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.05}
-        vertexColors
-        transparent
-        opacity={0.6}
-        sizeAttenuation
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
-  );
-}
-
-// Main animated sphere with enhanced materials
-function AnimatedSphere() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const { mouse } = useThree();
-
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      // Smooth rotation with time
-      meshRef.current.rotation.x = clock.getElapsedTime() * 0.15;
-      meshRef.current.rotation.y = clock.getElapsedTime() * 0.2;
-
-      // Gentle mouse interaction
-      meshRef.current.rotation.x += mouse.y * 0.05;
-      meshRef.current.rotation.y += mouse.x * 0.05;
-
-      // Subtle floating animation
-      meshRef.current.position.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.2;
-    }
-  });
-
-  return (
-    <Sphere ref={meshRef} args={[1.5, 128, 128]} scale={1.4}>
-      <MeshDistortMaterial
-        color="#00d4ff"
-        attach="material"
-        distort={0.5}
-        speed={1.5}
-        roughness={0.1}
-        metalness={0.8}
-        emissive="#00d4ff"
-        emissiveIntensity={0.3}
-      />
-    </Sphere>
-  );
-}
-
-// Outer glow sphere
-function GlowSphere() {
-  const glowRef = useRef<THREE.Mesh>(null);
-
-  useFrame(({ clock }) => {
-    if (glowRef.current) {
-      glowRef.current.rotation.x = clock.getElapsedTime() * -0.1;
-      glowRef.current.rotation.y = clock.getElapsedTime() * -0.15;
-      
-      // Pulsing effect
-      const scale = 1.8 + Math.sin(clock.getElapsedTime() * 2) * 0.1;
-      glowRef.current.scale.set(scale, scale, scale);
-    }
-  });
-
-  return (
-    <Sphere ref={glowRef} args={[1.5, 64, 64]}>
-      <meshBasicMaterial
-        color="#a855f7"
-        transparent
-        opacity={0.15}
-        blending={THREE.AdditiveBlending}
-        side={THREE.BackSide}
-      />
-    </Sphere>
-  );
-}
-
-// Loading fallback
-function Loader() {
-  return (
-    <mesh>
-      <sphereGeometry args={[1, 32, 32]} />
-      <meshStandardMaterial color="#00d4ff" wireframe />
-    </mesh>
-  );
-}
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export const AnimatedOrb = () => {
+  const [particles, setParticles] = useState<
+    Array<{ x: number; y: number; delay: number; duration: number }>
+  >([]);
+
+  useEffect(() => {
+    // Generate random particles
+    const newParticles = Array.from({ length: 50 }, () => ({
+      x: Math.random() * 600 - 300,
+      y: Math.random() * 600 - 300,
+      delay: Math.random() * 2,
+      duration: 3 + Math.random() * 2,
+    }));
+    setParticles(newParticles);
+  }, []);
+
   return (
-    <div className="w-full h-[400px] md:h-[500px] relative">
-      <Canvas
-        camera={{ position: [0, 0, 6], fov: 50 }}
-        gl={{ 
-          antialias: true, 
-          alpha: true,
-          powerPreference: "high-performance"
+    <div className="relative w-full h-[500px] flex items-center justify-center">
+      {/* Main gradient orb */}
+      <motion.div
+        className="absolute w-80 h-80 rounded-full"
+        style={{
+          background:
+            "linear-gradient(135deg, #06b6d4 0%, #a855f7 50%, #ec4899 100%)",
+          filter: "blur(40px)",
+        }}
+        animate={{
+          scale: [1, 1.2, 1],
+          rotate: [0, 180, 360],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      {/* Secondary orb */}
+      <motion.div
+        className="absolute w-60 h-60 rounded-full"
+        style={{
+          background: "linear-gradient(225deg, #a855f7 0%, #06b6d4 100%)",
+          filter: "blur(30px)",
+          opacity: 0.7,
+        }}
+        animate={{
+          scale: [1.2, 1, 1.2],
+          rotate: [360, 180, 0],
+          x: [-20, 20, -20],
+          y: [20, -20, 20],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      {/* Solid centered orb with glow */}
+      <motion.div
+        className="absolute w-64 h-64 rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(6, 182, 212, 0.8) 0%, rgba(168, 85, 247, 0.6) 50%, rgba(236, 72, 153, 0.4) 100%)",
+          boxShadow:
+            "0 0 100px rgba(6, 182, 212, 0.5), 0 0 200px rgba(168, 85, 247, 0.3)",
+        }}
+        animate={{
+          scale: [1, 1.05, 1],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      {/* Floating particles */}
+      {particles.map((particle, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-2 h-2 rounded-full bg-cyan-400"
+          style={{
+            left: `calc(50% + ${particle.x}px)`,
+            top: `calc(50% + ${particle.y}px)`,
+            boxShadow: "0 0 10px rgba(6, 182, 212, 0.8)",
+          }}
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.3, 1, 0.3],
+            scale: [0.5, 1, 0.5],
+          }}
+          transition={{
+            duration: particle.duration,
+            repeat: Infinity,
+            delay: particle.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Rotating rings */}
+      <motion.div
+        className="absolute w-96 h-96 rounded-full border-2 border-cyan-400/30"
+        animate={{
+          rotate: 360,
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          rotate: { duration: 10, repeat: Infinity, ease: "linear" },
+          scale: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+        }}
+      />
+
+      <motion.div
+        className="absolute w-80 h-80 rounded-full border-2 border-purple-400/20"
+        animate={{
+          rotate: -360,
+          scale: [1.1, 1, 1.1],
+        }}
+        transition={{
+          rotate: { duration: 15, repeat: Infinity, ease: "linear" },
+          scale: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+        }}
+      />
+
+      {/* Center icon */}
+      <motion.div
+        className="absolute z-10"
+        animate={{
+          y: [-10, 10, -10],
+          rotateZ: [-5, 5, -5],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
         }}
       >
-        <Suspense fallback={<Loader />}>
-          {/* Enhanced lighting setup */}
-          <ambientLight intensity={0.3} />
-          <directionalLight position={[5, 5, 5]} intensity={1} color="#00d4ff" />
-          <directionalLight position={[-5, -5, -5]} intensity={0.5} color="#a855f7" />
-          <pointLight position={[0, 0, 0]} intensity={1.5} color="#ffffff" distance={8} />
-          <pointLight position={[3, 3, 3]} intensity={0.8} color="#00d4ff" />
-          <pointLight position={[-3, -3, -3]} intensity={0.8} color="#a855f7" />
-
-          {/* Starfield background */}
-          <Stars
-            radius={100}
-            depth={50}
-            count={3000}
-            factor={4}
-            saturation={0.5}
-            fade
-            speed={0.5}
+        <svg
+          width="80"
+          height="80"
+          viewBox="0 0 64 64"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient
+              id="iconGradient"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop
+                offset="0%"
+                style={{ stopColor: "#06b6d4", stopOpacity: 1 }}
+              />
+              <stop
+                offset="100%"
+                style={{ stopColor: "#a855f7", stopOpacity: 1 }}
+              />
+            </linearGradient>
+          </defs>
+          {/* Refund arrow */}
+          <path
+            d="M 32 12 A 16 16 0 1 1 20 24"
+            stroke="url(#iconGradient)"
+            strokeWidth="4"
+            strokeLinecap="round"
+            fill="none"
           />
-
-          {/* Main components */}
-          <GlowSphere />
-          <AnimatedSphere />
-          <Particles />
-
-          {/* Optional orbit controls for manual rotation */}
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            autoRotate
-            autoRotateSpeed={0.5}
-            maxPolarAngle={Math.PI / 2}
-            minPolarAngle={Math.PI / 2}
+          <path d="M 20 24 L 20 16 L 12 24 Z" fill="url(#iconGradient)" />
+          {/* Dollar sign */}
+          <path
+            d="M 30 28 L 34 28 C 36 28 37 29 37 31 C 37 33 36 34 34 34 L 30 34"
+            stroke="url(#iconGradient)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            fill="none"
           />
-        </Suspense>
-      </Canvas>
-
-      {/* Gradient overlay for extra polish */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/50 pointer-events-none" />
+          <path
+            d="M 30 34 L 35 34 C 37 34 38 35 38 37 C 38 39 37 40 35 40 L 30 40"
+            stroke="url(#iconGradient)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <line
+            x1="32"
+            y1="26"
+            x2="32"
+            y2="42"
+            stroke="url(#iconGradient)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </motion.div>
     </div>
   );
 };

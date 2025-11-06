@@ -191,8 +191,7 @@ contract RevertPayManager is ReentrancyGuard {
         // Burn the rNFT
         rnft.burn(tokenId);
 
-        // Unreserve and pay refund
-        vault.unreserve(merchant, netAmount);
+        // Pay refund (payRefund handles unreserving internally)
         vault.payRefund(merchant, token, msg.sender, netAmount);
 
         emit Refunded(tokenId, msg.sender, netAmount);
