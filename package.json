@@ -1,0 +1,32 @@
+{
+  "name": "revert-pay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RevertPay - Refundable crypto payments with tradable refund rights",
+  "scripts": {
+    "web:dev": "cd web && npm run dev",
+    "web:build": "cd web && npm run build",
+    "web:preview": "cd web && npm run preview",
+    "contracts:compile": "cd contracts && npx hardhat compile",
+    "contracts:test": "cd contracts && npx hardhat test",
+    "contracts:clean": "cd contracts && npx hardhat clean",
+    "contracts:export-abis": "cd contracts && npx ts-node scripts/exportAbis.ts",
+    "deploy:amoy": "cd contracts && npx hardhat run scripts/deploy.ts --network amoy && npx ts-node scripts/exportAbis.ts",
+    "deploy:polygon": "cd contracts && npx hardhat run scripts/deploy.ts --network polygon && npx ts-node scripts/exportAbis.ts",
+    "verify:amoy": "cd contracts && npx hardhat run scripts/verify.ts --network amoy",
+    "verify:polygon": "cd contracts && npx hardhat run scripts/verify.ts --network polygon"
+  },
+  "workspaces": [
+    "web",
+    "contracts"
+  ],
+  "keywords": [
+    "blockchain",
+    "polygon",
+    "refund",
+    "nft",
+    "payments"
+  ],
+  "author": "",
+  "license": "MIT"
+}

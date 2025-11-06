@@ -1,0 +1,16 @@
+{
+  "137": {
+    "RefundPolicyRegistry": "",
+    "RefundVault": "",
+    "RefundRight": "",
+    "RevertPayManager": "",
+    "MockUSDC": ""
+  },
+  "80002": {
+    "MANAGER": "0xC3313Edd7E15087c3301141F8eC25A14c47bb08b",
+    "POLICY": "0xa4C96647E5718ff6673395b7a5D85632eEFd61db",
+    "VAULT": "0xCef4d4911B224E858F3c15f0C82cF098e8Ad103c",
+    "RNFT": "0x8A04D093e439a783D0F67CDd3B56e3aacE8E2297",
+    "MOCKUSDC": "0x50aADCa249821ED7BA61Df29eaD40F46EF7D0B87"
+  }
+}

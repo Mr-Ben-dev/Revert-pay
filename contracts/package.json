@@ -1,0 +1,36 @@
+{
+  "name": "revertpay-contracts",
+  "version": "1.0.0",
+  "description": "RevertPay Smart Contracts - Refundable crypto payments with tradable refund rights",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:amoy": "hardhat run scripts/deploy.ts --network amoy",
+    "deploy:polygon": "hardhat run scripts/deploy.ts --network polygon",
+    "verify:amoy": "hardhat run scripts/verify.ts --network amoy",
+    "verify:polygon": "hardhat run scripts/verify.ts --network polygon"
+  },
+  "keywords": [
+    "hardhat",
+    "solidity",
+    "polygon",
+    "nft",
+    "refund"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@types/node": "^20.0.0",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.0.0",
+    "ethers": "^6.10.0",
+    "viem": "^2.0.0"
+  }
+}
