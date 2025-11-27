@@ -1,19 +1,20 @@
-import { Toaster } from "@/components/ui/toaster";
+import { Navbar } from "@/components/shared/Navbar";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Navbar } from "@/components/shared/Navbar";
-import Home from "./pages/Home";
-import MerchantDashboard from "./pages/MerchantDashboard";
-import CreatePolicy from "./pages/CreatePolicy";
-import GenerateLink from "./pages/GenerateLink";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Checkout from "./pages/Checkout";
-import MyRNFTs from "./pages/MyRNFTs";
-import Market from "./pages/Market";
+import CreatePolicy from "./pages/CreatePolicy";
 import Docs from "./pages/Docs";
+import GenerateLink from "./pages/GenerateLink";
+import Home from "./pages/Home";
 import Legal from "./pages/Legal";
+import Market from "./pages/Market";
+import MerchantDashboard from "./pages/MerchantDashboard";
+import MyRNFTs from "./pages/MyRNFTs";
 import NotFound from "./pages/NotFound";
+import Stats from "./pages/Stats";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/pay/:linkId" element={<Checkout />} />
           <Route path="/me" element={<MyRNFTs />} />
           <Route path="/market" element={<Market />} />
+          <Route path="/stats" element={<Stats />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="/legal" element={<Legal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

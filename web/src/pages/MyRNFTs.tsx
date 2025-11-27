@@ -1,15 +1,7 @@
-import { GradientButton } from "@/components/shared/GradientButton";
+import { ListingDialog } from "@/components/shared/ListingDialog";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { RNFTCard } from "@/components/shared/RNFTCard";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useMarketplace } from "@/hooks/useMarketplace";
 import { getAddresses } from "@/lib/wagmi";
 import RefundRightABI from "@/shared/abis/RefundRight.json";
 import RevertPayManagerABI from "@/shared/abis/RevertPayManager.json";
@@ -37,12 +29,13 @@ const MyRNFTs = () => {
   const addresses = getAddresses(chainId);
   const { addToast } = useStore();
   const [listDialogOpen, setListDialogOpen] = useState(false);
-  const [selectedTokenId, setSelectedTokenId] = useState<bigint | null>(null);
-  const [listPrice, setListPrice] = useState("");
+  const [selectedRNFT, setSelectedRNFT] = useState<RNFTData | null>(null);
   const [rnfts, setRnfts] = useState<RNFTData[]>([]);
   const [isRefunding, setIsRefunding] = useState(false);
 
   const { writeContract } = useWriteContract();
+  const { listRNFT, checkApproval, approveRNFT, isListing, isApproving } =
+    useMarketplace();
 
   // Read the total number of NFTs owned by the user
   const { data: balance } = useReadContract({
@@ -178,38 +171,52 @@ const MyRNFTs = () => {
   };
 
   const handleListForSale = (tokenId: bigint) => {
-    setSelectedTokenId(tokenId);
-    setListDialogOpen(true);
+    // Find the full rNFT data for smart pricing
+    const rnft = rnfts.find((r) => r.tokenId === tokenId);
+    if (rnft) {
+      setSelectedRNFT(rnft);
+      setListDialogOpen(true);
+    }
   };
 
-  const handleConfirmListing = async () => {
-    if (!selectedTokenId || !account) return;
+  const handleConfirmListing = async (priceInWei: bigint) => {
+    if (!selectedRNFT || !account) return;
 
-    const priceInWei = BigInt(Math.floor(Number(listPrice) * 1e18));
+    try {
+      // Check if we need approval first
+      const isApproved = await checkApproval(selectedRNFT.tokenId);
 
-    writeContract(
-      {
-        address: addresses?.MANAGER as `0x${string}`,
-        abi: RevertPayManagerABI as any,
-        functionName: "list",
-        args: [selectedTokenId, priceInWei],
-        chain,
-        account: account!,
-      },
-      {
-        onSuccess: () => {
-          addToast("rNFT listed for sale successfully", "success");
-          setListDialogOpen(false);
-          setListPrice("");
-          setSelectedTokenId(null);
-          setTimeout(() => window.location.reload(), 2000);
-        },
-        onError: (error: any) => {
-          console.error("Listing error:", error);
-          addToast(error.message || "Failed to list rNFT", "error");
-        },
+      if (!isApproved) {
+        addToast("Approving marketplace to transfer your rNFT...", "info");
+        const approveSuccess = await approveRNFT(selectedRNFT.tokenId);
+        if (!approveSuccess) {
+          addToast("Failed to approve marketplace", "error");
+          return;
+        }
+        addToast("Approval successful! Now listing...", "success");
       }
-    );
+
+      // Now list the rNFT
+      const success = await listRNFT(selectedRNFT.tokenId, priceInWei);
+
+      if (success) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+        addToast("rNFT listed for sale successfully!", "success");
+        setListDialogOpen(false);
+        setSelectedRNFT(null);
+        // Remove from local list (it's now listed)
+        setRnfts((prevRnfts) =>
+          prevRnfts.filter((nft) => nft.tokenId !== selectedRNFT.tokenId)
+        );
+      }
+    } catch (error: any) {
+      console.error("Listing error:", error);
+      addToast(error.message || "Failed to list rNFT", "error");
+    }
   };
 
   return (
@@ -256,34 +263,16 @@ const MyRNFTs = () => {
           </div>
         )}
 
-        <Dialog open={listDialogOpen} onOpenChange={setListDialogOpen}>
-          <DialogContent className="glass-card border-border">
-            <DialogHeader>
-              <DialogTitle>List rNFT for Sale</DialogTitle>
-              <DialogDescription>
-                Set a price for your rNFT. Buyers can purchase it at a discount.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <Label htmlFor="price">Sale Price (USDC)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  value={listPrice}
-                  onChange={(e) => setListPrice(e.target.value)}
-                  className="mt-2 bg-input border-border"
-                />
-              </div>
-              <GradientButton onClick={handleConfirmListing} className="w-full">
-                List for Sale
-              </GradientButton>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {/* Listing Dialog with Smart Pricing */}
+        <ListingDialog
+          open={listDialogOpen}
+          onOpenChange={setListDialogOpen}
+          tokenId={selectedRNFT?.tokenId ?? BigInt(0)}
+          originalAmount={selectedRNFT?.amount ?? BigInt(0)}
+          expiresAt={selectedRNFT ? Number(selectedRNFT.expiresAt) : 0}
+          onConfirmListing={handleConfirmListing}
+          isLoading={isListing || isApproving}
+        />
       </div>
     </div>
   );

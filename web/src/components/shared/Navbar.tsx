@@ -23,6 +23,7 @@ export const Navbar = () => {
     { to: "/merchant", label: "Merchant" },
     { to: "/me", label: "My rNFTs" },
     { to: "/market", label: "Market" },
+    { to: "/stats", label: "Stats" },
     { to: "/docs", label: "Docs" },
   ];
 
