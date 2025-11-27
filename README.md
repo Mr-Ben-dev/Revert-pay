@@ -2,14 +2,23 @@
 
 **Refundable crypto payments with tradable refund rights on Polygon** 🔄💰
 
-A decentralized payment system that enables merchants to accept crypto payments while issuing transferable refund rights as NFTs (rNFTs). Buyers can refund their purchases or trade their refund rights on a secondary marketplace.
+> _"Turn refund uncertainty into tradable liquidity"_
+
+A decentralized payment system that enables merchants to accept crypto payments while issuing transferable refund rights as NFTs (rNFTs). Buyers can refund their purchases or trade their refund rights on a secondary marketplace at a discount.
 
 ![Polygon Amoy Testnet](https://img.shields.io/badge/Polygon-Amoy_Testnet-8247E5?style=flat-square&logo=polygon)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
 ![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=flat-square&logo=typescript)
+![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?style=flat-square&logo=vercel)
+
+## 🌐 Live Demo
+
+**🚀 [https://revert-pay.vercel.app/](https://revert-pay.vercel.app/)**
 
 ## 🎯 Features
+
+### Core Features
 
 - **🔄 Refundable Payments**: Merchants can offer refunds with customizable policies
 - **🎨 Tradable Refund Rights**: rNFTs can be traded on the built-in marketplace
@@ -17,6 +26,17 @@ A decentralized payment system that enables merchants to accept crypto payments 
 - **💰 Restocking Fees**: Optional fees for processing refunds
 - **🔐 Decentralized**: Fully on-chain with no intermediaries
 - **🌐 Multi-Chain Ready**: Deployed on Polygon Amoy testnet, ready for mainnet
+
+### Wave 3 Features (NEW!)
+
+- **📊 Ecosystem Stats Dashboard**: Real-time analytics with TVL, volume, and user metrics
+- **🏆 Gamification Badges**: Bronze/Silver/Gold/Diamond trader badges based on activity
+- **📈 Market Depth Visualization**: See liquidity distribution across discount levels
+- **🔒 Privacy Mode**: Toggle anonymous seller addresses in marketplace
+- **💡 Smart Pricing**: AI-suggested listing prices based on time-to-expiry
+- **🎯 Advanced Filters**: Search, sort, and filter marketplace listings
+- **📥 CSV Export**: Export ecosystem stats for grant applications
+- **🎉 Confetti Celebrations**: Visual feedback on successful transactions
 
 ## 🏗️ Architecture
 
@@ -27,13 +47,13 @@ Located in `contracts/contracts/`:
 - **RefundPolicyRegistry** (`0xa4C96647E5718ff6673395b7a5D85632eEFd61db`)  
   Manages refund policies per merchant (token, refund window, restocking fee, auto-approve)
 
-- **RefundVault** (`0xca7aFd9EaDAeDA8d9725eAF03154c6495Cd0b363`)  
+- **RefundVault** (`0x9e172c0413a9593a90C7630659483Ca1f9b1a5F4`)  
   Handles ERC-20 deposits/withdrawals by merchants, tracks reserved balances for active orders
 
-- **RefundRight** (`0xdE7Fd95Bdf716C8bf13FCBdd3b852550297D8D05`)  
+- **RefundRight** (`0xA4939970e3e37eC48F11BC7615eB8CD80768e8c5`)  
   ERC-721 NFT representing refund rights with on-chain metadata and enumeration
 
-- **RevertPayManager** (`0x7dcC3d114cdD3Da59e7A091E5f50E5d27766076D`)  
+- **RevertPayManager** (`0x12E48AAD8fe612b116A270bBFE72361573fc6037`)  
   Main orchestrator for order creation, refunds, and marketplace listings/purchases
 
 - **MockUSDC** (`0x50aADCa249821ED7BA61Df29eaD40F46EF7D0B87`)  
@@ -79,11 +99,11 @@ VITE_CHAIN_ID=80002
 VITE_WALLETCONNECT_PROJECT_ID=your_project_id
 VITE_ALCHEMY_API_KEY=your_alchemy_key
 
-# Contract addresses (Polygon Amoy)
-VITE_MANAGER_80002=0x7dcC3d114cdD3Da59e7A091E5f50E5d27766076D
+# Contract addresses (Polygon Amoy) - LATEST DEPLOYED
+VITE_MANAGER_80002=0x12E48AAD8fe612b116A270bBFE72361573fc6037
 VITE_POLICY_80002=0xa4C96647E5718ff6673395b7a5D85632eEFd61db
-VITE_VAULT_80002=0xca7aFd9EaDAeDA8d9725eAF03154c6495Cd0b363
-VITE_RNFT_80002=0xdE7Fd95Bdf716C8bf13FCBdd3b852550297D8D05
+VITE_VAULT_80002=0x9e172c0413a9593a90C7630659483Ca1f9b1a5F4
+VITE_RNFT_80002=0xA4939970e3e37eC48F11BC7615eB8CD80768e8c5
 VITE_MOCKUSDC_80002=0x50aADCa249821ED7BA61Df29eaD40F46EF7D0B87
 ```
 
@@ -270,16 +290,32 @@ During development, we encountered a circular dependency between contracts:
 
 ## 🗺️ Roadmap
 
+### ✅ Completed
+
 - [x] Core payment and refund functionality
 - [x] rNFT marketplace (list/buy/cancel)
 - [x] On-chain metadata
 - [x] Web UI with wallet integration
+- [x] **Ecosystem Stats Dashboard** (Wave 3)
+- [x] **Gamification Badges** (Wave 3)
+- [x] **Market Depth Visualization** (Wave 3)
+- [x] **Smart Pricing Algorithm** (Wave 3)
+- [x] **Privacy Mode** (Wave 3)
+- [x] **CSV Export for Grants** (Wave 3)
+- [x] **Vercel Deployment** (Wave 3)
+
+### 🚧 In Progress
+
 - [ ] Contract tests (comprehensive suite)
 - [ ] Multi-token support (beyond USDC)
+
+### 📋 Planned
+
 - [ ] Gasless meta-transactions
 - [ ] Subgraph for event indexing
 - [ ] Mobile app (React Native)
 - [ ] Security audit
+- [ ] Katana DEX integration for liquidity
 
 ## 🤝 Contributing
 
@@ -296,14 +332,39 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## 🔗 Links
 
-- **Website**: Coming soon
-- **Docs**: Coming soon
+- **Live App**: [https://revert-pay.vercel.app/](https://revert-pay.vercel.app/)
+- **GitHub**: [https://github.com/Mr-Ben-dev/Revert-pay](https://github.com/Mr-Ben-dev/Revert-pay)
+- **Polygon Amoy Explorer**: [View Contracts](https://amoy.polygonscan.com/address/0x12E48AAD8fe612b116A270bBFE72361573fc6037)
+
+## 📸 Screenshots
+
+### Marketplace with Smart Pricing
+
+Browse rNFTs at discounted prices with urgency-based coloring and privacy mode.
+
+### Ecosystem Stats Dashboard
+
+Track TVL, volume, user metrics, and export data for grant applications.
+
+### Gamification Badges
+
+Earn Bronze 🥉, Silver 🥈, Gold 🥇, or Diamond 💎 badges based on trading activity.
+
 - **Twitter**: Coming soon
 - **Discord**: Coming soon
 
 ## 👨‍💻 Author
 
 Built with ❤️ by [@Mr-Ben-dev](https://github.com/Mr-Ben-dev)
+
+## 🏆 Buildathon Submission
+
+**RevertPay** was built for the Polygon Buildathon, focusing on:
+
+- **Real USDC payments** on Polygon Amoy testnet
+- **Deep liquidity** through tradable refund rights
+- **Privacy features** for anonymous marketplace trading
+- **Grant-ready analytics** with CSV export functionality
 
 ---
 
